@@ -1,4 +1,5 @@
-# Root-context image only ships `backend/`; keep build small and deterministic.
+# Used when build context is repo root and Dockerfile is `backend/Dockerfile`
+# (e.g. `docker build -f backend/Dockerfile .`). Docker reads this from the context root.
 .git
 .github
 .expo
