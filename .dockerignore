@@ -1,0 +1,16 @@
+# Root-context image only ships `backend/`; keep build small and deterministic.
+.git
+.github
+.expo
+node_modules
+app
+assets
+components
+constants
+context
+data
+lib
+scripts
+*.md
+.env
+.env.*

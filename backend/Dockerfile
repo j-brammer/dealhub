@@ -1,3 +1,4 @@
+# Use when Docker build context is `backend/` (e.g. Northflank: context `/backend/`, Dockerfile `/backend/Dockerfile`).
 FROM node:20-alpine
 WORKDIR /app
 
