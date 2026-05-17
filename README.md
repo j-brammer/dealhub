@@ -8,35 +8,49 @@ DealHub is a **deliberate alternative** for families and caregivers who want a l
 
 If you are supporting someone in **memory care**—at home or in a facility—this project is for you: less noise, fewer dark patterns, and a path to **private installs** where **you** control the device, the credentials, and who receives the build. The technical sections below explain how to set that up.
 
+**This is not a one-tap install.** There is no App Store listing you can hand to someone and walk away. DealHub takes **real setup**: eBay developer credentials, editing config files, building the app, and loading it onto a phone (often with a Mac for iPhone). Plan on **hours, not minutes**, the first time. If that is not you, that is normal—**find someone in the family** (or a trusted friend) who is comfortable with **code**, or at least with **AI assistants** that can follow the README with them, and ask them to get the first build onto the device. After it is installed and trusted, day-to-day use can stay simple for the person shopping; the hard part is the one-time technical lift.
+
 ---
 
 React Native app built with **Expo SDK 54** and **Expo Router**. The in-app catalog is powered by the **eBay Browse API** (live listings). You can run it in **Expo Go** during development or produce **installable builds** with **EAS Build**.
 
-**Self-builders:** There is no hosted “DealHub API key.” You need your own **eBay developer application** (and, depending on how you ship, **Apple** / **Google** / **Expo** accounts). See [Required accounts (self-build)](#required-accounts-self-build).
+**Self-builders:** There is no hosted “DealHub API key” and no store install—you configure and build the app yourself (see [Why DealHub exists](#why-dealhub-exists)). You need your own **eBay developer application** (and, depending on how you ship, **Apple** / **Google** / **Expo** accounts). See [Required accounts (self-build)](#required-accounts-self-build).
+
+## Screenshots
+
+DealHub includes **light** and **dark** themes. **By default**, **Account → Appearance** is **Use device setting**—the app follows the phone’s system light/dark mode (iOS **Settings → Display & Brightness**, Android **Display**). Shoppers can also pin **Light** or **Dark** if you prefer a fixed look.
+
+The captures below are from **dark mode** on iPhone.
+
+| Home — prize wheel | Home — browse & search | Orders |
+|:---:|:---:|:---:|
+| ![DealHub home with daily prize wheel modal](image1.png) | ![DealHub home screen with categories and product grid](image2.png) | ![DealHub orders list with delivered items](image3.png) |
+| Daily spin for store credit; calmer than flash-sale apps | Search, filters, and eBay-powered recommendations | Order history saved on the device |
 
 ---
 
 ## Table of contents
 
 1. [Why DealHub exists](#why-dealhub-exists)
-2. [Overview](#overview)
-3. [Required accounts (self-build)](#required-accounts-self-build)
-4. [What you need installed](#what-you-need-installed)
-5. [One-time setup](#one-time-setup)
-6. [Configuration (environment variables)](#configuration-environment-variables)
-7. [Private distribution & eBay Developer credentials](#private-distribution--ebay-developer-credentials)
-8. [Building release binaries](#building-release-binaries)
-9. [Install on a physical iOS device](#install-on-a-physical-ios-device)
-10. [Install on a physical Android device](#install-on-a-physical-android-device)
-11. [Run the app (development)](#run-the-app-development)
-12. [Using the app](#using-the-app)
-13. [Production and test builds (EAS)](#production-and-test-builds-eas)
-14. [App icons and brand assets](#app-icons-and-brand-assets)
-15. [Project layout](#project-layout)
-16. [Command reference](#command-reference)
-17. [Troubleshooting](#troubleshooting)
-18. [Keeping the repo current (and contributing)](#keeping-the-repo-current-and-contributing)
-19. [Links](#links)
+2. [Screenshots](#screenshots)
+3. [Overview](#overview)
+4. [Required accounts (self-build)](#required-accounts-self-build)
+5. [What you need installed](#what-you-need-installed)
+6. [One-time setup](#one-time-setup)
+7. [Configuration (environment variables)](#configuration-environment-variables)
+8. [Private distribution & eBay Developer credentials](#private-distribution--ebay-developer-credentials)
+9. [Building release binaries](#building-release-binaries)
+10. [Install on a physical iOS device](#install-on-a-physical-ios-device)
+11. [Install on a physical Android device](#install-on-a-physical-android-device)
+12. [Run the app (development)](#run-the-app-development)
+13. [Using the app](#using-the-app)
+14. [Production and test builds (EAS)](#production-and-test-builds-eas)
+15. [App icons and brand assets](#app-icons-and-brand-assets)
+16. [Project layout](#project-layout)
+17. [Command reference](#command-reference)
+18. [Troubleshooting](#troubleshooting)
+19. [Keeping the repo current (and contributing)](#keeping-the-repo-current-and-contributing)
+20. [Links](#links)
 
 ---
 
@@ -47,8 +61,9 @@ React Native app built with **Expo SDK 54** and **Expo Router**. The in-app cata
 | **Framework** | Expo ~54, React 19, React Native 0.81, New Architecture enabled (`app.json`). |
 | **Navigation** | File-based routes under `app/` (tabs: Home, Orders, Cart, Account; stacks for product, category, order detail). |
 | **Catalog** | eBay Browse search + item detail; credentials via `EXPO_PUBLIC_EBAY_*` in `.env`. |
-| **Local state** | Cart, account (profile, addresses, payments), orders, wallet / prize wheel, theme preference — mostly **AsyncStorage** on device. |
+| **Local state** | Cart, account (profile, addresses, payments), orders, wallet / prize wheel, theme preference — **on the phone only** via **AsyncStorage** (no DealHub cloud). See [Privacy and data](#privacy-and-data-addresses-payments). |
 | **Deep linking** | Scheme `dealhub` (see `app.json`). |
+| **Appearance** | **Light** / **Dark** / **Use device setting** (default). Follows system light/dark when set to device; override in **Account → Appearance**. See [Screenshots](#screenshots). |
 
 ---
 
@@ -77,7 +92,7 @@ Without these, the app builds but **listing search and item detail will not auth
 ### iOS (Apple)
 
 - **Always:** An **Apple ID** signed into **Xcode** (Xcode → Settings → Accounts) so Xcode can create **signing certificates** and **provisioning profiles**.
-- **USB / local install (iOS 16+):** **Developer Mode** on the phone; **Trust** the Mac when prompted; after install, **Trust** the developer app under **VPN & Device Management** ([Install on a physical iOS device](#install-on-a-physical-ios-device)).
+- **USB / local install (iOS 16+):** **Developer Mode** on the phone; **Trust** the Mac when prompted; after install, [trust the developer app](#trust-the-developer-app-first-launch-after-usb-install) (tap DealHub first—Settings path varies by iOS version).
 - **USB / local install:** Personal Team or paid team; each **new device UDID** must be on your provisioning profile (Xcode automatic signing or the `xcodebuild` flags in the install guide).
 - **TestFlight or App Store:** **Apple Developer Program** membership and **App Store Connect** access for the same (or linked) Apple identity / team.
 - **Push:** This repo adjusts entitlements for **Personal Team** limits; full **remote push** with Apple’s production environment usually expects a **paid** program and correct capabilities—see [Troubleshooting](#troubleshooting).
@@ -129,6 +144,8 @@ Confirm with `adb devices` when an emulator is running.
 ---
 
 ## One-time setup
+
+**Who should run this section?** A caregiver who is already technical, or a relative who can spend an afternoon with the README (and optionally an AI coding agent). Most families should **not** expect the person with memory challenges to perform these steps.
 
 From the repository root:
 
@@ -353,6 +370,48 @@ Without Developer Mode enabled, Xcode may time out with **error 70** or refuse t
 1. Connect the iPhone with USB.
 2. Unlock the phone; tap **Trust** if iOS asks whether to trust this computer.
 
+This is **only** about the USB connection to your Mac—not the same as trusting the DealHub app to run (see [Trust the developer app](#trust-the-developer-app-first-launch-after-usb-install) below).
+
+### Trust the developer app (first launch after USB install)
+
+After a USB install, DealHub may sit on the home screen but **will not launch** until you trust the Apple ID that signed it. On many iPhones the trust screen **does not exist in Settings until you tap DealHub once** and iOS shows an **Untrusted Developer** (or similar) alert.
+
+**Recommended flow (try this first)**
+
+1. Tap the **DealHub** icon on the home screen.
+2. Read the alert. If it offers **Details**, **Settings**, or a link to open the trust page, use that—this is the most reliable path on current iOS.
+3. If the alert only has **Cancel**, open **Settings** manually and continue with step 4.
+
+**Manual path in Settings (labels vary by iOS version)**
+
+4. Open **Settings → General** and scroll toward the bottom. Look for **one** of these menu names (your phone may not show all of them):
+
+   | Menu name under **General** | Typical iOS versions |
+   |-----------------------------|--------------------|
+   | **VPN & Device Management** | iOS 15–17 (and some 18+) |
+   | **Device Management** | Some iOS 18+ builds |
+   | **Profiles & Device Management** | iOS 14 and earlier |
+
+   **Cannot find it?** In Settings, pull down and **search** for `Device Management`, `VPN`, or `Developer`. Do **not** look under **Privacy & Security** for this step—that is where **Developer Mode** lives (a separate requirement; see [Developer Mode (iOS 16+)](#developer-mode-ios-16)).
+
+5. Open that menu. Under **Developer App** (or a list that shows your Apple ID / team), tap the developer name—often **Apple Development: you@email.com** or your Apple ID display name.
+
+6. Confirm trust (wording depends on iOS):
+
+   - **iOS 17 and earlier:** tap **Trust**, then confirm **Trust** again.
+   - **iOS 18 and later:** you may see **Allow & Restart** (or similar) instead of **Trust**. The phone may **restart**; after it comes back, follow any on-screen steps. Stay on **Wi‑Fi or cellular** so Apple can verify the certificate.
+
+7. Open **DealHub** again from the home screen.
+
+**Still stuck?**
+
+| Situation | What to try |
+|-----------|-------------|
+| **No “VPN / Device / Profiles” item under General** | Tap DealHub once, then check **General** again. Re-run the USB install if the app never actually installed. |
+| **You only see VPN configs, no Developer App** | Wrong screen, or first launch was skipped—tap DealHub, then return to **General**. |
+| **“DealHub” Is No Longer Available** | Signing expired; reinstall first ([troubleshooting](#ios-device-dealhub-is-no-longer-available)), then trust again. |
+| **Developer Mode** | **Settings → Privacy & Security → Developer Mode** must be **On** for USB dev installs (iOS 16+). That is separate from trusting the developer certificate under **General**. |
+
 ### Personal Team: unique bundle identifier
 
 If you sign with a **free Apple ID** (“Personal Team”) and **Automatically manage signing**, provisioning often **only succeeds** when the app’s **bundle identifier** is **unique to you**—typically reverse-DNS such as `com.yourname.dealhub`—not a generic id that Apple has already associated with another app or another team.
@@ -387,8 +446,8 @@ This uses **Release** so **`main.jsbundle`** is embedded: the app runs from the 
 |--------|------------|
 | **Build succeeded, install failed: device locked** | Unlock the phone and run the same command again (install often completes on retry). |
 | **Build failed: provisioning profile doesn’t include device** | Phone is new to your Apple team. With the device connected and **Automatically manage signing** on in Xcode, run once: `cd ios && xcodebuild -workspace DealHub.xcworkspace -scheme DealHub -configuration Release -destination 'id=<UDID>' -allowProvisioningUpdates -allowProvisioningDeviceRegistration build` then retry `expo run:ios`. Or open **`ios/DealHub.xcworkspace`**, select the device, and **Run** once so Xcode registers the UDID. |
-| **Install OK, launch failed: untrusted / Security** | On the phone: **Settings → General → VPN & Device Management** → **Developer App** → **Trust** (see below). Open DealHub from the home screen. |
-| **CLI exits 0 but app won’t open** | Trust step above; confirm **Developer Mode** is on. |
+| **Install OK, launch failed: untrusted / Security** | [Trust the developer app](#trust-the-developer-app-first-launch-after-usb-install): tap DealHub first, then follow the alert or **Settings → General** (menu name varies). |
+| **CLI exits 0 but app won’t open** | Same trust steps; confirm **Developer Mode** is on. |
 
 **Recipient’s phone:** They must **Trust** *your* developer certificate the first time you install a build signed with your Apple ID (Personal Team). They do **not** need your eBay keys in source if you built the binary—but the binary still contains whatever `EXPO_PUBLIC_*` values were baked in at build time on your Mac.
 
@@ -400,13 +459,7 @@ This uses **Release** so **`main.jsbundle`** is embedded: the app runs from the 
 4. For an install that runs **without Metro** when opened from the home screen, set the run scheme to **Release** (or use **`npm run ios:device`** instead). **Debug** on device is mainly for live reload with a reachable dev server.
 5. Press **Run** (▶). Xcode builds, signs, and installs DealHub.
 
-First launch: if iOS blocks the app or shows **Untrusted Developer** (or similar), **follow what the system tells you**—the alert often includes a button that opens the correct Settings page. That flow is the one Apple intends; you do not need a separate workaround.
-
-If you prefer to go there manually:
-
-1. **Settings → General → VPN & Device Management** (or **Profiles & Device Management** on older iOS).
-2. Tap your **Developer App** certificate under **Developer App**.
-3. Tap **Trust**.
+First launch: see [Trust the developer app](#trust-the-developer-app-first-launch-after-usb-install)—tap DealHub first; the trust entry in Settings often appears only after that alert.
 
 ### Install via TestFlight (recommended for non-developer friends)
 
@@ -523,7 +576,23 @@ npx tsc --noEmit
 
 ## Using the app
 
-This is a **DealHub-branded** shopping-style shell over **eBay listings** (not an official eBay app).
+This is a **DealHub-branded** shopping-style shell over **eBay listings** (not an official eBay app). See [Screenshots](#screenshots) for the home screen, prize wheel, and orders list.
+
+### Privacy and data (addresses, payments)
+
+**Short answer for families:** DealHub does **not** send saved addresses or card details to a DealHub server—there is **no DealHub backend**. What someone enters for checkout convenience is kept **on that phone only**, except that **browsing and search** use the **eBay Browse API** (like any client using your eBay developer keys).
+
+| What | On the phone? | Sent to DealHub servers? | Notes |
+|------|---------------|--------------------------|--------|
+| **Shipping addresses** (Account / checkout) | Yes — saved locally for reuse | **No** | Full address fields in device storage. |
+| **Payment methods** | Yes — saved locally | **No** | **Full card numbers are not saved** — only a masked display (`**** **** **** 1234`) plus expiration/CVV fields used by the demo checkout UI (`context/AccountContext.tsx`). |
+| **Profile** (name, email, avatar) | Yes | **No** | |
+| **Cart, orders, store credit, theme** | Yes | **No** | |
+| **Product search / item detail** | Cached in memory during use | **No** (DealHub) | Requests go to **eBay** with `EXPO_PUBLIC_EBAY_*` credentials baked into the app. |
+
+**Checkout is not a real payment processor in this repo.** The cart → address → payment → review flow is an **illustrative** experience on top of eBay listings. DealHub does **not** charge a card or place an eBay order on the user’s behalf from here. If you need true “no card on device,” skip saving a payment method in Account and treat checkout as display-only.
+
+**Removing data:** Delete saved addresses or cards in **Account**, or uninstall the app / clear its storage on the device. Normal **iCloud / Google device backups** may still include app data per Apple/Google policy—DealHub does not add its own cloud copy.
 
 | Area | Behavior |
 |------|-----------|
@@ -531,8 +600,8 @@ This is a **DealHub-branded** shopping-style shell over **eBay listings** (not a
 | **Product** | Detail from eBay item id; **Add to cart** / **Buy now** (one unit per listing); images use large eBay CDN URLs when possible. |
 | **Cart** | One line per listing; checkout flow (address, payment, shipping, review) and **store credit** toggle when applicable. |
 | **Orders** | Saved orders from completed checkouts on device. |
-| **Account** | Profile, saved **addresses** and **payment methods**, **Appearance** (Light / Dark / Use device setting) at the bottom of the screen. |
-| **Theme** | Preference persisted in AsyncStorage; resolves to **light** or **dark** for UI and navigation theme. |
+| **Account** | Profile, saved **addresses** and **payment methods** (local to the phone; cards stored masked — see [Privacy and data](#privacy-and-data-addresses-payments)). **Appearance** at the bottom: **Light**, **Dark**, or **Use device setting** (default — matches the phone’s system theme). |
+| **Theme** | Default **Use device setting** follows iOS/Android light–dark mode; optional fixed Light or Dark. Preference saved on device (`context/ThemePreferenceContext.tsx`). |
 
 **Wallet / wheel:** Store credit and daily wheel flows use local persistence; see `context/WalletContext.tsx` and related components.
 
@@ -726,9 +795,55 @@ Your **Personal Team** profile was created before this phone was registered. Con
 - Build once from Xcode with that device selected, or  
 - Run `xcodebuild` with **`-allowProvisioningUpdates -allowProvisioningDeviceRegistration`** (see [Install via CLI](#install-via-cli-recommended-for-usb)), then retry **`expo run:ios`**.
 
+### iOS device: “DealHub” Is No Longer Available
+
+**Symptom:** Tapping the DealHub icon shows **“DealHub” Is No Longer Available** (or the app will not open at all). The icon may still be on the home screen.
+
+**Cause:** With a **free Apple ID (Personal Team)**, the development certificate and provisioning profile used to sign the app **expire after about 7 days**. iOS then treats the install as invalid until you build and install again with a fresh signature. This is expected for USB dev installs—not a bug in the app itself.
+
+**Fix (USB, same Mac that signed the app):**
+
+1. Connect the iPhone (**USB**, unlocked, **Trust** this computer, **Developer Mode** on — see [Developer Mode (iOS 16+)](#developer-mode-ios-16)).
+2. Rebuild and reinstall a **Release** build so `main.jsbundle` is embedded (see [Install via CLI](#install-via-cli-recommended-for-usb)):
+
+   ```bash
+   xcrun xctrace list devices   # or: xcrun devicectl list devices
+   npx expo run:ios --configuration Release --device "<device name or UDID>"
+   ```
+
+3. If **`expo run:ios`** fails with **no provisioning profile** or **Automatic signing is disabled**, register the device and refresh profiles with **`xcodebuild`** (from repo root, after `cd ios && pod install`):
+
+   ```bash
+   cd ios && xcodebuild -workspace DealHub.xcworkspace -scheme DealHub -configuration Release \
+     -destination 'id=<UDID>' \
+     -allowProvisioningUpdates -allowProvisioningDeviceRegistration build
+   ```
+
+   Then install the built app (adjust the DerivedData folder name if yours differs — look under `~/Library/Developer/Xcode/DerivedData/DealHub-*/`):
+
+   ```bash
+   xcrun devicectl device install app --device "<device name>" \
+     ~/Library/Developer/Xcode/DerivedData/DealHub-*/Build/Products/Release-iphoneos/DealHub.app
+   ```
+
+4. **Trust** the developer again if iOS blocks launch: follow [Trust the developer app](#trust-the-developer-app-first-launch-after-usb-install) (tap DealHub first; on iOS 18+ you may need **Allow & Restart**).
+5. If you **changed `expo.ios.bundleIdentifier`** at some point (e.g. from `com.dealhub.app` to `com.yourname.dealhub`), you may have **two** DealHub icons. **Delete** the old one that still shows this message; open the build that matches the bundle id currently in **[app.json](app.json)** / Xcode.
+
+**Related build errors when reinstalling:**
+
+| Error | What to do |
+|--------|------------|
+| **`iOS 26.x is not installed`** (xcodebuild error **70**) | Install the matching **iOS platform** in **Xcode → Settings → Components**, or run `xcodebuild -downloadPlatform iOS`, then retry. |
+| **Provisioning profile doesn’t include device** | See [Provisioning profile doesn’t include device](#ios-device-provisioning-profile-doesnt-include-device) below. |
+| **Untrusted developer / invalid code signature** | Trust step in item 4 above. |
+
+**Avoiding weekly reinstalls:** A **paid Apple Developer Program** membership, **TestFlight**, or **App Store** distribution uses longer-lived signing for testers. Personal Team USB installs are fine for your own phone but need this refresh roughly **once a week**.
+
 ### iOS device: Untrusted developer / invalid code signature on launch
 
-Install often **succeeded**; iOS blocks **launch** until the user trusts the certificate: **Settings → General → VPN & Device Management** → **Developer App** → **Trust**. This is normal when installing on **someone else’s** iPhone with **your** signing identity.
+Install often **succeeded**; iOS blocks **launch** until the user trusts the signing identity. The exact Settings menu name and button label (**Trust** vs **Allow & Restart**) **vary by iOS version**—do not assume **Settings → General → VPN & Device Management** exists on every phone.
+
+**Use the full steps in [Trust the developer app](#trust-the-developer-app-first-launch-after-usb-install).** In short: **tap DealHub on the home screen first**, use any **Settings** link in the alert if shown, then look under **Settings → General** for **VPN & Device Management**, **Device Management**, or **Profiles & Device Management**. This is normal on **someone else’s** iPhone with **your** signing identity, and after fixing [**“DealHub” Is No Longer Available**](#ios-device-dealhub-is-no-longer-available).
 
 ### iOS device: Device locked
 
