@@ -1,5 +1,15 @@
 # DealHub
 
+## Why DealHub exists
+
+Shopping on a phone should not feel like a trap. Apps such as **Temu**, **Shein**, and other bargain-marketplace experiences are built to **pull people back again and again**—flash sales, countdown timers, gamified rewards, endless scroll, and one-tap checkout. For someone living with **dementia**, **mild cognitive impairment**, **post-stroke memory changes**, **ADHD-related impulsivity**, or simply the **normal forgetfulness** that comes with aging, those patterns are especially risky. A person may not remember placing an order, may not recognize how much they have already spent, or may feel ashamed and confused when packages keep arriving.
+
+DealHub is a **deliberate alternative** for families and caregivers who want a loved one to still browse and buy real items—without handing them an app whose business model depends on **impulse and confusion**. We are not claiming to be medical software or a substitute for human judgment; we are offering a **calmer storefront** you can build and install yourself, with familiar shopping flows and without the predatory urgency of the worst “deal” apps.
+
+If you are supporting someone in **memory care**—at home or in a facility—this project is for you: less noise, fewer dark patterns, and a path to **private installs** where **you** control the device, the credentials, and who receives the build. The technical sections below explain how to set that up.
+
+---
+
 React Native app built with **Expo SDK 54** and **Expo Router**. The in-app catalog is powered by the **eBay Browse API** (live listings). You can run it in **Expo Go** during development or produce **installable builds** with **EAS Build**.
 
 **Self-builders:** There is no hosted “DealHub API key.” You need your own **eBay developer application** (and, depending on how you ship, **Apple** / **Google** / **Expo** accounts). See [Required accounts (self-build)](#required-accounts-self-build).
@@ -8,24 +18,25 @@ React Native app built with **Expo SDK 54** and **Expo Router**. The in-app cata
 
 ## Table of contents
 
-1. [Overview](#overview)
-2. [Required accounts (self-build)](#required-accounts-self-build)
-3. [What you need installed](#what-you-need-installed)
-4. [One-time setup](#one-time-setup)
-5. [Configuration (environment variables)](#configuration-environment-variables)
-6. [Private distribution & eBay Developer credentials](#private-distribution--ebay-developer-credentials)
-7. [Building release binaries](#building-release-binaries)
-8. [Install on a physical iOS device](#install-on-a-physical-ios-device)
-9. [Install on a physical Android device](#install-on-a-physical-android-device)
-10. [Run the app (development)](#run-the-app-development)
-11. [Using the app](#using-the-app)
-12. [Production and test builds (EAS)](#production-and-test-builds-eas)
-13. [App icons and brand assets](#app-icons-and-brand-assets)
-14. [Project layout](#project-layout)
-15. [Optional: Picsum / Platzi scripts](#optional-picsum--platzi-scripts)
-16. [Command reference](#command-reference)
-17. [Troubleshooting](#troubleshooting)
-18. [Links](#links)
+1. [Why DealHub exists](#why-dealhub-exists)
+2. [Overview](#overview)
+3. [Required accounts (self-build)](#required-accounts-self-build)
+4. [What you need installed](#what-you-need-installed)
+5. [One-time setup](#one-time-setup)
+6. [Configuration (environment variables)](#configuration-environment-variables)
+7. [Private distribution & eBay Developer credentials](#private-distribution--ebay-developer-credentials)
+8. [Building release binaries](#building-release-binaries)
+9. [Install on a physical iOS device](#install-on-a-physical-ios-device)
+10. [Install on a physical Android device](#install-on-a-physical-android-device)
+11. [Run the app (development)](#run-the-app-development)
+12. [Using the app](#using-the-app)
+13. [Production and test builds (EAS)](#production-and-test-builds-eas)
+14. [App icons and brand assets](#app-icons-and-brand-assets)
+15. [Project layout](#project-layout)
+16. [Optional: Picsum / Platzi scripts](#optional-picsum--platzi-scripts)
+17. [Command reference](#command-reference)
+18. [Troubleshooting](#troubleshooting)
+19. [Links](#links)
 
 ---
 
@@ -816,3 +827,7 @@ Install often **succeeded**; iOS blocks **launch** until the user trusts the cer
 - [eBay Buy Browse API](https://developer.ebay.com/api-docs/buy/browse/overview.html)
 
 If paths differ on your machine (e.g. Linux `ANDROID_HOME`), adjust environment variables and retry `adb devices` / `npm run simulators`.
+
+---
+
+*DealHub was built for my mom—with love, patience, and the hope that shopping on her phone can feel safe again.*
