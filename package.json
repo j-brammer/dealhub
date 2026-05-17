@@ -18,9 +18,7 @@
     "eas:build:preview:ios": "eas build --profile preview --platform ios",
     "eas:build:preview:android": "eas build --profile preview --platform android",
     "eas:build:prod:ios": "eas build --profile production --platform ios",
-    "eas:build:prod:android": "eas build --profile production --platform android",
-    "picsum:enrich": "node scripts/picsum-ollama-batch.mjs",
-    "platzi:seed": "node scripts/platzi-seed-from-enrichment.mjs"
+    "eas:build:prod:android": "eas build --profile production --platform android"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",

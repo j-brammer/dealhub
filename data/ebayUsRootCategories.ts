@@ -108,7 +108,7 @@ function row(r: { id: string; label: string }): StoreCategory {
     label: r.label,
     emoji,
     numericId: Number.isFinite(n) ? n : 0,
-    image: `https://picsum.photos/seed/ebay-cat-${id}/400/300`,
+    image: `https://placehold.co/400x300/e2e8f0/64748b?text=${encodeURIComponent(emoji)}`,
   };
 }
 
@@ -120,7 +120,7 @@ export const EBAY_ALL_CATEGORY: StoreCategory = {
   label: 'All',
   emoji: EMOJI.all,
   numericId: 0,
-  image: 'https://picsum.photos/seed/ebay-all/400/300',
+  image: `https://placehold.co/400x300/e2e8f0/64748b?text=${encodeURIComponent(EMOJI.all)}`,
 };
 
 /** All US root departments plus an `All` pseudo-lane (keyword search across the marketplace). */

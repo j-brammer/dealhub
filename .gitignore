@@ -37,9 +37,6 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
-# Local Picsum/Ollama enrichment checkpoint (optional — remove this line to commit)
-data/picsum-enrichment.json
-
 # generated native folders
 /ios
 /android

@@ -33,10 +33,9 @@ React Native app built with **Expo SDK 54** and **Expo Router**. The in-app cata
 13. [Production and test builds (EAS)](#production-and-test-builds-eas)
 14. [App icons and brand assets](#app-icons-and-brand-assets)
 15. [Project layout](#project-layout)
-16. [Optional: Picsum / Platzi scripts](#optional-picsum--platzi-scripts)
-17. [Command reference](#command-reference)
-18. [Troubleshooting](#troubleshooting)
-19. [Links](#links)
+16. [Command reference](#command-reference)
+17. [Troubleshooting](#troubleshooting)
+18. [Links](#links)
 
 ---
 
@@ -183,10 +182,6 @@ Account checklist (eBay, Apple, Google, Expo) for anyone building from source: [
 - **Practical model for DealHub:** each **trusted recipient** (you, a colleague, a friend) **creates their own eBay developer application**, puts **their own** `EXPO_PUBLIC_EBAY_CLIENT_ID` / `EXPO_PUBLIC_EBAY_CLIENT_SECRET` in `.env`, and **builds the app themselves** (or you hand them a binary **they** built on their machine). That way each person’s usage counts against **their** eBay app, not yours.
 
 This README explains how to **get eBay credentials** and how to **build and install** the native app on **iOS and Android** devices.
-
-### Security reality check
-
-Even when you distribute only to friends, **`EXPO_PUBLIC_*` values are still inside the client**. If you need keys to stay confidential from the person holding the phone, you must add a **backend** and keep secrets on the server.
 
 ### Step-by-step: Join the eBay Developers Program and create API keys
 
@@ -614,83 +609,12 @@ Source artwork for multiple platforms may also live under **`DealHub_Icons/`**; 
 | `data/` | eBay category roots, mappers, shipping options, product types. |
 | `lib/` | eBay Browse client, helpers (e.g. card mask). |
 | `assets/` | Images, fonts. |
-| `scripts/` | `adb-reverse.sh`, optional Picsum/Platzi Node scripts. |
+| `scripts/` | `adb-reverse.sh` and other small dev helpers. |
 | `app.json` / `eas.json` | Expo and EAS configuration. |
 | `plugins/` | Expo config plugins (iOS signing / bundling helpers). |
 | `DealHub_Icons/` | Optional source icon sizes; shipped assets under `assets/images/`. |
 
 **Note:** Catalog traffic goes to **eBay** from the app (`lib/ebayBrowseClient.ts`). There is **no** separate DealHub backend in this repo.
-
----
-
-## Optional: Picsum / Platzi scripts
-
-These **Node** scripts are **not** used by the live eBay-powered app. They are optional tooling to build a checkpoint JSON from **Picsum** + local **Ollama**, then POST demo products to the **Platzi Fake Store** API.
-
-**Requirements:** Node 18+, Ollama with a vision model, network access.
-
-```bash
-npm run picsum:enrich -- 10
-npm run platzi:seed -- --limit 5
-```
-
-Details, flags, and pricing rules are documented in the long sections below (same behavior as before).
-
-### 1. Enrich: Picsum + Ollama → JSON
-
-Start Ollama, then from the repo root. **npm** needs `--` before arguments passed to the script:
-
-```bash
-npm run picsum:enrich -- 10
-```
-
-That is shorthand for `--count 10`. Equivalent long form:
-
-```bash
-npm run picsum:enrich -- --count 10
-```
-
-Default output file: **`data/picsum-enrichment.json`**. Use another path:
-
-```bash
-npm run picsum:enrich -- --output ./my-enrichment.json 25
-```
-
-Useful flags (see `node scripts/picsum-ollama-batch.mjs --help`):
-
-| Flag | Purpose |
-|------|---------|
-| `--count` / `-n` | **Required.** How many **Picsum ids** to scan this run (not “number of buyable items”). |
-| `--output` / `-o` | Checkpoint JSON path. |
-| `--start-id` | Force the next id to scan (overrides resume from `lastIDProcessed + 1`). |
-| `--model` / `-m` | Ollama model name (or env **`OLLAMA_MODEL`**). |
-| `--host` | Ollama base URL (or env **`OLLAMA_HOST`**, default `http://127.0.0.1:11434`). |
-| `--width`, `--height` | Picsum image dimensions (default 512×512). |
-
-**Source of truth:** The JSON file holds **`lastIDProcessed`** and **`results`**; the enricher rewrites atomically after each id. **`platzi:seed`** removes rows from **`results`** only after a successful POST.
-
-**Interrupts:** `Ctrl+C` stops after the **current** id; progress is already on disk.
-
-### 2. Seed: JSON → Platzi Fake Store
-
-```bash
-npm run platzi:seed -- --limit 5
-```
-
-| Flag | Purpose |
-|------|---------|
-| `--input` / `-i` | Enrichment JSON path. |
-| `--limit` / `-n` | Max successful POSTs **this run**. |
-| `--buyable-only` | Post only **`buyable: true`** rows. |
-| `--delay` | Milliseconds between POSTs (default **400**). |
-
-**Note:** Platzi is a **shared demo API**; behavior and auth may change. The seed script uses distinct **`slug`** / title suffixes to reduce collisions.
-
-### Suggested workflow (optional tooling)
-
-1. Run enrich in small **`--count`** chunks; inspect JSON.
-2. Run **`platzi:seed`** with a small **`--limit`**.
-3. Commit the JSON only if you want it in git (large files are often gitignored).
 
 ---
 
@@ -713,8 +637,6 @@ npm run platzi:seed -- --limit 5
 | `npm run eas:build:dev:ios` / `:android` | EAS **development** profile. |
 | `npm run eas:build:preview:ios` / `:android` | EAS **preview** (internal; APK on Android). |
 | `npm run eas:build:prod:ios` / `:android` | EAS **production** profile. |
-| `npm run picsum:enrich` | Optional Picsum + Ollama enricher (pass args after `--`). |
-| `npm run platzi:seed` | Optional Platzi seeder. |
 | `npx expo start --clear --localhost` | Clear Metro cache + localhost. |
 
 ---
