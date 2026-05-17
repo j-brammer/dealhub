@@ -9,6 +9,12 @@ export type EbayImage = {
   imageUrl?: string;
 };
 
+export type EbaySeller = {
+  username?: string;
+  feedbackPercentage?: string;
+  feedbackScore?: number;
+};
+
 export type EbayItemSummary = {
   itemId: string;
   title?: string;
@@ -20,6 +26,11 @@ export type EbayItemSummary = {
   };
   shortDescription?: string;
   itemWebUrl?: string;
+  seller?: EbaySeller;
+  condition?: string;
+  conditionId?: string;
+  buyingOptions?: string[];
+  topRatedBuyingExperience?: boolean;
 };
 
 export type EbayItemDetail = EbayItemSummary & {
@@ -60,9 +71,28 @@ function pickImages(dto: EbayItemSummary | EbayItemDetail): string[] {
   return urls.filter((u) => /^https:\/\//i.test(u.trim()));
 }
 
+function ratingFromSeller(s?: EbaySeller): { rating: number; reviewCount: number } | null {
+  if (!s) return null;
+  const pct = Number.parseFloat(String(s.feedbackPercentage ?? '').replace(/%/g, ''));
+  const score = Number(s.feedbackScore);
+  if (!Number.isFinite(pct) || pct < 0 || pct > 100) return null;
+  const rating = round2((pct / 100) * 5);
+  const reviewCount = Number.isFinite(score) && score >= 0 ? score : 0;
+  return { rating, reviewCount };
+}
+
+function tagFromListing(dto: EbayItemSummary, h: number): string | undefined {
+  if (dto.topRatedBuyingExperience) return 'Top Rated Plus';
+  if (dto.condition === 'New' || dto.conditionId === '1000') return 'New';
+  const opts = dto.buyingOptions ?? [];
+  if (opts.includes('AUCTION') && !opts.includes('FIXED_PRICE')) return 'Auction';
+  if (opts.includes('FIXED_PRICE')) return 'Buy It Now';
+  if (h % 17 === 0) return 'Deal';
+  return undefined;
+}
+
 /**
- * Maps eBay Browse item summary to app `Product`.
- * @param categorySlug feed or category slug used for this listing (not always eBay's taxonomy).
+ * Maps eBay Browse item summary to app `Product` (live listing fields when present).
  */
 export function mapEbayItemSummaryToProduct(
   dto: EbayItemSummary,
@@ -75,10 +105,10 @@ export function mapEbayItemSummaryToProduct(
   const orig = dto.marketingPrice?.originalPrice;
   const compareRaw = orig ? round2(parsePrice(orig)) : round2(price * (1.08 + (h % 5) * 0.02));
   const compareAtPrice = compareRaw > price ? compareRaw : undefined;
-  const rating = round2(3.6 + (h % 14) / 10);
-  const reviewCount = 200 + (h * 7919) % 89000;
-  const tag =
-    h % 11 === 0 ? 'Lightning deal' : h % 9 === 0 ? 'Best seller' : h % 13 === 0 ? 'New' : undefined;
+  const fromSeller = ratingFromSeller(dto.seller);
+  const rating = fromSeller?.rating ?? round2(3.6 + (h % 14) / 10);
+  const reviewCount = fromSeller?.reviewCount ?? 200 + (h * 7919) % 89000;
+  const tag = tagFromListing(dto, h);
   const urls = pickImages(dto);
 
   return {

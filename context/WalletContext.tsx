@@ -3,6 +3,8 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useS
 
 const STORAGE_CREDIT = 'dealhub_store_credit';
 const STORAGE_SPIN_DAY = 'dealhub_wheel_spin_day';
+const STORAGE_JACKPOT = 'dealhub_progressive_jackpot';
+const DEFAULT_JACKPOT = 100;
 
 export function localCalendarDay(d = new Date()): string {
   const y = d.getFullYear();
@@ -14,11 +16,13 @@ export function localCalendarDay(d = new Date()): string {
 type WalletContextValue = {
   hydrated: boolean;
   storeCredit: number;
+  jackpotAmount: number;
   lastWheelSpinDay: string | null;
   /** True if the user has not completed a wheel spin today (local calendar). */
   canSpinWheelToday: boolean;
   addStoreCredit: (amount: number) => Promise<void>;
   deductStoreCredit: (amount: number) => Promise<void>;
+  setJackpotAmount: (amount: number) => Promise<void>;
   claimWheelPrize: (amount: number) => Promise<void>;
 };
 
@@ -38,18 +42,21 @@ async function readString(key: string): Promise<string | null> {
 export function WalletProvider({ children }: { children: React.ReactNode }) {
   const [hydrated, setHydrated] = useState(false);
   const [storeCredit, setStoreCredit] = useState(0);
+  const [jackpotAmount, setJackpotAmountState] = useState(DEFAULT_JACKPOT);
   const [lastWheelSpinDay, setLastWheelSpinDay] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
     (async () => {
       try {
-        const [credit, spinDay] = await Promise.all([
+        const [credit, jackpot, spinDay] = await Promise.all([
           readNumber(STORAGE_CREDIT, 0),
+          readNumber(STORAGE_JACKPOT, DEFAULT_JACKPOT),
           readString(STORAGE_SPIN_DAY),
         ]);
         if (!cancelled) {
           setStoreCredit(credit);
+          setJackpotAmountState(jackpot);
           setLastWheelSpinDay(spinDay);
         }
       } finally {
@@ -79,6 +86,12 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  const setJackpotAmount = useCallback(async (amount: number) => {
+    const next = Math.max(0, amount);
+    setJackpotAmountState(next);
+    await AsyncStorage.setItem(STORAGE_JACKPOT, String(next));
+  }, []);
+
   const claimWheelPrize = useCallback(async (amount: number) => {
     const day = localCalendarDay();
     const add = Math.max(0, amount);
@@ -97,19 +110,23 @@ export function WalletProvider({ children }: { children: React.ReactNode }) {
     () => ({
       hydrated,
       storeCredit,
+      jackpotAmount,
       lastWheelSpinDay,
       canSpinWheelToday,
       addStoreCredit,
       deductStoreCredit,
+      setJackpotAmount,
       claimWheelPrize,
     }),
     [
       hydrated,
       storeCredit,
+      jackpotAmount,
       lastWheelSpinDay,
       canSpinWheelToday,
       addStoreCredit,
       deductStoreCredit,
+      setJackpotAmount,
       claimWheelPrize,
     ]
   );

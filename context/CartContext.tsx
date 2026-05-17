@@ -5,14 +5,14 @@ import type { Product } from '@/data/products';
 
 export type CartLine = {
   productId: string;
-  quantity: number;
 };
 
 type CartContextValue = {
   lines: CartLine[];
-  addToCart: (productId: string, quantity?: number) => void;
+  /** One unit per listing; if the item is already in the cart, this is a no-op. */
+  addToCart: (productId: string) => void;
   removeLine: (productId: string) => void;
-  setQuantity: (productId: string, quantity: number) => void;
+  clearCart: () => void;
   itemCount: number;
   subtotal: number;
   linesWithProduct: { line: CartLine; product: Product }[];
@@ -24,13 +24,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const { getProductById } = useCatalog();
   const [lines, setLines] = useState<CartLine[]>([]);
 
-  const addToCart = useCallback((productId: string, quantity = 1) => {
+  const addToCart = useCallback((productId: string) => {
     setLines((prev) => {
-      const i = prev.findIndex((l) => l.productId === productId);
-      if (i === -1) return [...prev, { productId, quantity }];
-      const next = [...prev];
-      next[i] = { ...next[i], quantity: next[i].quantity + quantity };
-      return next;
+      if (prev.some((l) => l.productId === productId)) return prev;
+      return [...prev, { productId }];
     });
   }, []);
 
@@ -38,18 +35,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setLines((prev) => prev.filter((l) => l.productId !== productId));
   }, []);
 
-  const setQuantity = useCallback((productId: string, quantity: number) => {
-    if (quantity < 1) {
-      setLines((prev) => prev.filter((l) => l.productId !== productId));
-      return;
-    }
-    setLines((prev) => {
-      const i = prev.findIndex((l) => l.productId === productId);
-      if (i === -1) return prev;
-      const next = [...prev];
-      next[i] = { ...next[i], quantity };
-      return next;
-    });
+  const clearCart = useCallback(() => {
+    setLines([]);
   }, []);
 
   const value = useMemo<CartContextValue>(() => {
@@ -60,22 +47,19 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       })
       .filter(Boolean) as { line: CartLine; product: Product }[];
 
-    const subtotal = linesWithProduct.reduce(
-      (sum, { line, product }) => sum + product.price * line.quantity,
-      0
-    );
-    const itemCount = lines.reduce((n, l) => n + l.quantity, 0);
+    const subtotal = linesWithProduct.reduce((sum, { product }) => sum + product.price, 0);
+    const itemCount = lines.length;
 
     return {
       lines,
       addToCart,
       removeLine,
-      setQuantity,
+      clearCart,
       itemCount,
       subtotal,
       linesWithProduct,
     };
-  }, [lines, addToCart, removeLine, setQuantity, getProductById]);
+  }, [lines, addToCart, removeLine, clearCart, getProductById]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

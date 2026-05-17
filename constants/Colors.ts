@@ -3,34 +3,41 @@ const dealOrangeDark = '#E85D04';
 
 const light = {
   text: '#111827',
-  background: '#F3F4F6',
+  /** Screen chrome — a few steps darker than gray-100 for calmer contrast with white cards. */
+  background: '#E5E7EB',
   tint: dealOrange,
   tabIconDefault: '#9CA3AF',
   tabIconSelected: dealOrange,
   card: '#FFFFFF',
-  border: '#E5E7EB',
+  border: '#D1D5DB',
   muted: '#6B7280',
   price: '#DC2626',
   priceStrike: '#9CA3AF',
   banner: '#FFF7ED',
   accent: dealOrange,
   accentPressed: dealOrangeDark,
+  deliveredBadge: '#DCFCE7',
+  deliveredBadgeText: '#166534',
 };
 
 const dark = {
-  text: '#F9FAFB',
-  background: '#111827',
-  tint: '#FB923C',
-  tabIconDefault: '#6B7280',
-  tabIconSelected: '#FB923C',
-  card: '#1F2937',
-  border: '#374151',
-  muted: '#9CA3AF',
+  text: '#FAFAFA',
+  /** Near-black page chrome; cards sit a step above for separation. */
+  background: '#09090B',
+  tint: dealOrange,
+  tabIconDefault: '#71717A',
+  tabIconSelected: dealOrange,
+  card: '#18181B',
+  border: '#52525B',
+  muted: '#A1A1AA',
   price: '#F87171',
-  priceStrike: '#6B7280',
-  banner: '#292524',
-  accent: '#FB923C',
-  accentPressed: '#F97316',
+  priceStrike: '#71717A',
+  /** Warm dark surface echoing light orange banner. */
+  banner: '#271E16',
+  accent: dealOrange,
+  accentPressed: dealOrangeDark,
+  deliveredBadge: '#14532D',
+  deliveredBadgeText: '#86EFAC',
 };
 
 export default {
