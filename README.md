@@ -35,7 +35,8 @@ React Native app built with **Expo SDK 54** and **Expo Router**. The in-app cata
 15. [Project layout](#project-layout)
 16. [Command reference](#command-reference)
 17. [Troubleshooting](#troubleshooting)
-18. [Links](#links)
+18. [Keeping the repo current (and contributing)](#keeping-the-repo-current-and-contributing)
+19. [Links](#links)
 
 ---
 
@@ -732,6 +733,37 @@ Install often **succeeded**; iOS blocks **launch** until the user trusts the cer
 ### iOS device: Device locked
 
 `Cannot launch … device is locked` — unlock the phone and rerun the install command; the `.app` may already be on the device.
+
+---
+
+## Keeping the repo current (and contributing)
+
+Mobile tooling moves fast. A clone that worked last year may feel **out of date** today because **Xcode**, **iOS**, **Android Studio**, **Gradle**, **Expo SDK**, or **eBay’s APIs** have shifted. That does not mean the idea behind DealHub is wrong—it usually means **versions and docs need a refresh**.
+
+### If something no longer builds or the README feels stale
+
+1. **Run the usual health checks** from the repo root:
+   - `npx expo-doctor`
+   - `npx tsc --noEmit`
+   - `npm install` after pulling latest `main`
+2. **Compare your environment** to what the project targets (see [Overview](#overview) and `package.json` / `app.json`): current **Expo SDK**, **React Native**, **iOS deployment target**, and **Android SDK** levels.
+3. **Regenerate native projects** if you use local Xcode/Gradle and templates have drifted: `npx expo prebuild --clean` (back up signing changes first).
+4. **Use an AI coding agent** (Cursor, Copilot, Claude Code, etc.) with a prompt along these lines:
+   - *“Read this DealHub repo. What is outdated relative to current Expo SDK, React Native, Xcode/iOS, and Android Gradle requirements? List concrete file changes and README fixes.”*
+   - Ask it to cross-check **Apple’s current Xcode / iOS SDK requirements**, **Google’s compile/target SDK guidance**, and **[Expo’s upgrade docs](https://docs.expo.dev/workflow/upgrading-expo-sdk-walkthrough/)**.
+   - Have it verify **eBay Browse API** env vars and auth still match [eBay’s developer docs](https://developer.ebay.com/).
+
+An agent is useful for **scrubbing** `package.json`, config plugins, `eas.json`, and install steps—but always **run the build on a real device or simulator** before you trust the summary.
+
+### Free to use, fork, or improve
+
+DealHub is **free for everyone**. Use it for your own family, change the branding, or **fork** the repo and **own your copy** if you want a cadence I cannot match. You do not need permission to fork; keeping attribution in spirit of open source is appreciated but the goal is **helping people**, not gatekeeping.
+
+### Pull requests and maintainer time
+
+My own life is **busy and unpredictable**—I may **not** bump dependencies or rewrite docs on a fixed schedule. I **will** make time to **review thoughtful pull requests** when I can: dependency upgrades, README fixes for new iOS/Android steps, signing/plugin tweaks, and accessibility improvements are especially welcome.
+
+**Prefer contributing here?** Open a **PR** on [github.com/j-brammer/dealhub](https://github.com/j-brammer/dealhub) with a short note of what you tested (Xcode version, iOS version, device model, etc.). **Prefer to move at your own speed?** Fork and maintain your branch for your household—no hard feelings.
 
 ---
 
